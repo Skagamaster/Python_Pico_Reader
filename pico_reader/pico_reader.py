@@ -77,7 +77,12 @@ class EPD_Hits:
         ring_sum = np.zeros((32, len(self.nMip)))
         print("Filling array of dimension", ring_sum.shape)
         for i in range(32):
-            ring_i = ak.sum(ak.where(self.row == i+1, self.nMip, 0), axis=-1)
+            x = i%16
+            if i < 16:
+                ew_mask = ak.where(self.EW > 0, 1, 0)
+            else:
+                ew_mask = ak.where(self.EW < 0, 1, 0)
+            ring_i = ak.sum(ak.where(self.row == x+1, self.nMip, 0)*ew_mask, axis=-1)
             ring_sum[i] = ring_i
         return ring_sum
 
