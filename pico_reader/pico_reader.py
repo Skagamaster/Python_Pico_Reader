@@ -245,8 +245,10 @@ class Event_Cuts:
     The criteria function must accept a object of events and the event index as the parameters.
     A typical function might be:
     
-    def basic_filter_1cm(events, index):
-        return events.v_r[index] < 1  # Only get events within 1 cm of center
+    def basic_vertex_filter(events):
+        select = events.v_r <= 2.0  # All events within 2.0 cm of the origin in the transverse plane
+        select = select & np.abs(events.v_z) <= 30.0  # Additional parameter of being within 30.0 cm in z
+        return select
     """
     def __init__(self, events, criteria=None, mask=None):
         self.events = events
@@ -258,13 +260,12 @@ class Event_Cuts:
         
     def generate_mask(self, criteria, mask=None):
         """
-        generate_mask applies the criteria function to each event to determin if it is acceptable
+        generate_mask applies the criteria function to each event to determine if it is acceptable
         """
         if mask is None:
-            mask = np.zeros(self.events.num_events, dtype=np.bool)
-        for i in range(self.events.num_events):
-            if criteria(self.events, i):
-                mask[i] = True
+            mask = criteria
+        else:
+            mask = mask * criteria
         return mask
 
     def __getattr__(self, name):
