@@ -5,12 +5,16 @@ import awkward as ak
 pr = pico_reader.PicoDST()
 pr.import_data("st_physics_21250020_raw_6500001.picoDst.root")
 
-def basic_filter_1cm(events, index):
-    return events.v_r[index] < 1  # Only get events within 1 cm of center
+def basic_filter_1cm(events):
+    return events.v_r < 1  # Only get events within 1 cm of center
 
-def basic_filter_2cm(events, index):
-    return events.v_r[index] < 2  # Only get events within 2 cm of center
+def basic_filter_2cm(events):
+    return events.v_r < 2  # Only get events within 2 cm of center
 
+def basic_vertex_cut(events):
+    select = events.v_r <= 2.0  # transverse vertex within 2cm
+    select = select & np.abs(events.v_z) <= 30.0  # and a z cut at +- 30.0 cm
+    return select
 
 print(max(pr.v_r))
 
